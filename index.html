@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV数据展示</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV数据展示</h1>
+    <table id="csvTable">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>标题</th>
+                <th>时间</th>
+                <th>详情页链接</th>
+                <th>活动关键字</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- CSV数据将被插入到这里 -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 指定CSV文件的路径
+            const csvFilePath = 'dataset-key11.csv';
+            fetchCSV(csvFilePath);
+        });
+
+        function fetchCSV(filePath) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(text => displayCSV(text))
+                .catch(error => console.error('Error fetching CSV file:', error));
+        }
+
+        function displayCSV(text) {
+            const rows = text.split('\n');
+            const table = document.getElementById('csvTable').getElementsByTagName('tbody')[0];
+            table.innerHTML = ''; // 清空表格内容
+            rows.forEach((row, index) => {
+                const cols = row.split(',');
+                if (cols.length < 5) return; // 跳过不完整的行
+                const newRow = table.insertRow();
+                // 添加序号列
+                const indexCell = newRow.insertCell();
+                indexCell.textContent = index;
+
+                // 只处理标题、时间、详情页链接、活动关键字这四列
+                [0, 1, 2, 4].forEach(colIndex => {
+                    const newCell = newRow.insertCell();
+                    if (index > 0 && colIndex === 2) {
+                        const a = document.createElement('a');
+                        a.href = cols[colIndex].trim();
+                        a.textContent = cols[colIndex].trim();
+                        newCell.appendChild(a);
+                    } else {
+                        newCell.textContent = cols[colIndex].trim();
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
